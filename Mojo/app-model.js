@@ -7,6 +7,8 @@ App Model
  Description: Common functions for webOS apps, particularly for managing persisted options in cookies
 */
 
+//** Note: If you synced this file from a common repository, local edits may be over-written! */
+
 var AppModel = function() {
     //Define your default scene (needed for settings management)
     this.DefaultScene = "main";

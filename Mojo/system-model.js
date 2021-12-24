@@ -8,6 +8,8 @@ System Model
 				Privileged functions can only be called if your App ID starts with com.palm
 */
 
+//** Note: If you synced this file from a common repository, local edits may be over-written! */
+
 var SystemModel = function() {
 
 };
@@ -105,15 +107,20 @@ SystemModel.prototype.ClearSystemAlarm = function(alarmName) {
 
 //Allow the display to sleep
 SystemModel.prototype.AllowDisplaySleep = function(stageController) {
-    if (!stageController)
-        stageController = Mojo.Controller.getAppController().getActiveStageController();
+    try {
+        if (!stageController)
+            stageController = Mojo.Controller.getAppController().getActiveStageController();
 
-    //Tell the System it doesn't have to stay awake any more
-    Mojo.Log.info("Allowing display sleep");
+        //Tell the System it doesn't have to stay awake any more
+        Mojo.Log.info("Allowing display sleep");
 
-    stageController.setWindowProperties({
-        blockScreenTimeout: false
-    });
+        stageController.setWindowProperties({
+            blockScreenTimeout: false
+        });
+    } catch(e) {
+        //If the stage has already gone away, this function will return an error
+        //  But it doesn't matter because webOS will perform this function anyway during stage clean-up
+    }
 }
 
 //Prevent the display from sleeping
@@ -227,7 +234,7 @@ SystemModel.prototype.Vibrate = function(vibrate) {
 
 //Lock the physical volume buttons to the media volume (instead of default, notification volume)
 SystemModel.prototype.LockVolumeKeys = function() {
-    Mojo.Log.info("Locking to volume keys");
+    Mojo.Log.info("Locking media volume to hardware buttons");
     this.wakeupRequest = new Mojo.Service.Request("palm://com.palm.audio/media", {
         method: "lockVolumeKeys",
         onSuccess: function(response) {
