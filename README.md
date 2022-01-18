@@ -43,7 +43,7 @@ If you want more control over the user experience, you can pass in an optional c
 ```
 this.$.myUpdater.CheckForUpdate(this, "Name of your app in App Museum II", this.updateCallBack);
 ...
-updateResponseCallBack: function(self, message) {
+updateCallBack: function(self, message) {
      enyo.log("Got an updater response: " + message);
      self.$.SelfUpdater.PromptUserForUpdate(message);
 },
@@ -54,10 +54,10 @@ For ultimate control, handle the UI yourself, then call the installer:
 ```
 this.$.myUpdater.CheckForUpdate(this, "Name of your app in App Museum II", this.updateCallBack);
 ...
-updateResponseCallBack: function(self, message) {
+updateCallBack: function(self, message) {
      enyo.log("Got an updater response: " + message);
-     //Do your own UI
-     if(UIResponse = true)
+     var UIResponse = {}; //Do your own UI
+     if(UIResponse == true)
           self.$.SelfUpdater.DoInstall(LastUpdateResponse.downloadURI);
 },
 ```
