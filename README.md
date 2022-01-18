@@ -41,7 +41,7 @@ this.$.myUpdater.CheckForUpdate(this, "Name of your app as listed in App Museum 
 If you want more control over the user experience, you can pass in an optional call back method:
 
 ```
-this.$.myUpdater.CheckForUpdate(this, "Name of your app as listed in App Museum II", this.updateResponseCallBack);
+this.$.myUpdater.CheckForUpdate(this, "Name of your app in App Museum II", this.updateCallBack);
 ...
 updateResponseCallBack: function(self, message) {
      enyo.log("Got an updater response: " + message);
@@ -52,7 +52,7 @@ updateResponseCallBack: function(self, message) {
 For ultimate control, handle the UI yourself, then call the installer:
 
 ```
-this.$.myUpdater.CheckForUpdate(this, "Name of your app as listed in App Museum II", this.updateResponseCallBack);
+this.$.myUpdater.CheckForUpdate(this, "Name of your app in App Museum II", this.updateCallBack);
 ...
 updateResponseCallBack: function(self, message) {
      enyo.log("Got an updater response: " + message);
