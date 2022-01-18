@@ -37,6 +37,20 @@ MainAssistant.prototype.activate = function(event) {
        example, key handlers that are observing the document */
 }
 
+//Handle menu and button bar commands -- Used in Updater Example #2
+MainAssistant.prototype.handleCommand = function(event) {
+    if (event.type == Mojo.Event.command) {
+        switch (event.command) {
+            case 'do-updateCheck':
+                var updaterModel = null;
+                updaterModel = new UpdaterModel(); //Make sure the Updater model is included in your sources.json
+                updaterModel.CheckForUpdate("Your app name", this.handleUpdateResponse.bind(this));
+                break;
+        }
+    }
+};
+
+
 //Call back for Updater Check -- Used in Updater Example #1 and #2
 MainAssistant.prototype.handleUpdateResponse = function(responseObj) {
     if (responseObj && responseObj.updateFound) {
@@ -50,19 +64,6 @@ MainAssistant.prototype.handleUpdateResponse = function(responseObj) {
         }.bind(this));
     }
 }
-
-//Handle menu and button bar commands -- Used in Updater Example #2
-MainAssistant.prototype.handleCommand = function(event) {
-    if (event.type == Mojo.Event.command) {
-        switch (event.command) {
-            case 'do-updateCheck':
-                var updaterModel = null;
-                updaterModel = new UpdaterModel(); //Make sure the Updater model is included in your sources.json
-                updaterModel.CheckForUpdate("Your app name", this.handleUpdateResponse.bind(this));
-                break;
-        }
-    }
-};
 
 //Helper for showing a dialog box - Used in Updater Example #1 and #2
 MainAssistant.showDialogBox = function(title, message) {

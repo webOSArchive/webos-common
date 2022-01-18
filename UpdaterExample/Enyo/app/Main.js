@@ -18,7 +18,7 @@ enyo.kind({
     create: function() {
         this.inherited(arguments);
         /* Updater Example #1: Check for updates when the app launches */
-        this.$.myUpdater.CheckForUpdate("webOS Archive Proxy");
+        this.$.myUpdater.CheckForUpdate(this, "My App");
     },
 
     /* Updater Example #2: another great option might be to have a menu option,
@@ -26,7 +26,7 @@ enyo.kind({
     handleItemSelected: function(inSender, inEvent) {
         switch (inEvent) {
             case 'Check for Updates':
-                this.$.myUpdater.CheckForUpdate("webOS Archive Proxy");
+                this.$.myUpdater.CheckForUpdate(this, "My App");
                 break;
         }
     },
