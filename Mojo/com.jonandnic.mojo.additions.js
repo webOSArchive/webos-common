@@ -65,6 +65,16 @@ Additions.SetWidgetLabel = function(widgetName, newvalue) {
     }
 }
 
+Additions.GetWidgetLabel = function(widgetName) {
+    var stageController = Mojo.Controller.getAppController().getActiveStageController();
+    if (stageController) {
+        this.controller = stageController.activeScene();
+
+        var thisWidgetModel = this.controller.getWidgetSetup(widgetName).model;
+        return thisWidgetModel.label;
+    }
+}
+
 Additions.SetToggleState = function(widgetName, toggledValue) {
     var stageController = Mojo.Controller.getAppController().getStageController("");
     if (stageController) {
