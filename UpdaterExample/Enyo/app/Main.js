@@ -11,7 +11,12 @@ enyo.kind({
         },
         {
             kind: "Helpers.Updater", //Make sure the Updater Helper is included in your depends.json
-            name: "myUpdater"
+            name: "myUpdater",
+            /*
+            //If you prefer to handle the user interaction yourself:
+            handleUI: false,
+            onUpdateFound: "showUpdateUI"
+            */
         }
     ],
 
@@ -30,4 +35,13 @@ enyo.kind({
                 break;
         }
     },
+
+    showUpdateUI: function() {
+        var updateMsg = myUpdater.VersionNote;
+        myUpdater.PromptUserForUpdate(updateMsg);
+        /*
+        //Or make your own UI, and when ready to install, call:
+        myUpdater.InstallViaPreware();
+        */
+    }
 });
