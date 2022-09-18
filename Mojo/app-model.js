@@ -20,10 +20,27 @@ var AppModel = function() {
     //Define your app preferences (to be saved by OS)
     this.AppSettingsCurrent = null;
     this.AppSettingsDefaults = {
+        ThemePreference: "palm-default",
         UseCustomEndpoint: false,
         EndpointURL: "",
         LastVersionRun: 0
     };
+}
+
+//For apps that support the common theme preference
+AppModel.prototype.SetThemePreference = function(theController) {
+    if (appModel.AppSettingsCurrent["ThemePreference"] != "system-theme") {
+        theController.document.body.className = appModel.AppSettingsCurrent["ThemePreference"];
+        document.body.className = appModel.AppSettingsCurrent["ThemePreference"];
+        Mojo.Log.info("Using local theme pref: " + appModel.AppSettingsCurrent["ThemePreference"]);
+    } else {
+        systemModel.LoadWOSAPrefs(function(response) {
+            if (response) {
+                Mojo.Log.info("Using system theme pref: " + systemModel.WOSAPrefs.theme);
+                theController.document.body.className = systemModel.WOSAPrefs.theme;
+            }
+        }.bind(this))
+    }
 }
 
 //You probably don't need to change the below functions since they all work against the Cookie defaults you defined above.
