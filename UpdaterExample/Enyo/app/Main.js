@@ -23,7 +23,7 @@ enyo.kind({
     create: function() {
         this.inherited(arguments);
         /* Updater Example #1: Check for updates when the app launches */
-        this.$.myUpdater.CheckForUpdate(this, "My App");
+        this.$.myUpdater.CheckForUpdate("My App");
     },
 
     /* Updater Example #2: another great option might be to have a menu option,
