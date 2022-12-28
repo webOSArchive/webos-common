@@ -1,3 +1,5 @@
+var updaterModel = null;
+
 function MainAssistant() {
     /* this is the creator function for your scene assistant object. It will be passed all the 
        additional parameters (after the scene name) that were passed to pushScene. The reference
@@ -16,7 +18,6 @@ MainAssistant.prototype.setup = function() {
     /* Updater Example #1: Check for updates when the app launches
         You can choose where and when to do this -- but don't do it in activate of a scene, 
         or it'll pop-up each time your scene moves to the top of the scene stack. */
-    var updaterModel = null;
     updaterModel = new UpdaterModel(); //Make sure the Updater model is included in your sources.json
     updaterModel.CheckForUpdate("Your app name", this.handleUpdateResponse.bind(this));
 
