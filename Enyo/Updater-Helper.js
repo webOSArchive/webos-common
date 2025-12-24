@@ -142,7 +142,11 @@ enyo.kind({
         newUrl = newUrl + "&clientid=" + this.deviceId;
         newUrl = newUrl + "&device=" + encodeURIComponent(deviceData);
         
+        if (location.protocol !== 'https:') {
+            newUrl = newUrl.replace("http://", "https://");
+        }
         enyo.log("Update Helper is checking for updates with URL: " + newUrl);
+
         this.$.updateServiceCheck.setUrl(newUrl);
         this.$.updateServiceCheck.call();
     },
