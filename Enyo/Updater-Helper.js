@@ -157,7 +157,7 @@ enyo.kind({
             if (this.isVersionHigher(currVersion, museumVersion)) {
                 enyo.log("Updater Helper found an update in webOS App Museum II!");
                 this.VersionNote = inResponse.versionNote;
-                this.doUpdateFound();
+                this.doUpdateFound(this.VersionNote);
                 if (this.handleUI) {
                     enyo.log("Updater Helper is handling UI for user prompt.");
                     this.PromptUserForUpdate(this.VersionNote);
