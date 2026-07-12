@@ -22,6 +22,20 @@ Understanding Mojo can be challenging, and some functions are overly complex. Th
 
 ## Enyo
 
+### OAuthBroker-Helper.js
+
+A complete Helper component that signs a legacy webOS app into a modern OAuth service (Box, Google, Dropbox, Instapaper, …) through the shared webOS OAuth broker at `oauth.wosa.link`. The device can't do OAuth itself — its 2009-era TLS can't reach modern endpoints and its browser can't render a consent screen — so the broker does it: the device shows a short code, the user finishes signing in on a real browser, and the device polls for the resulting tokens. Handles both broker flows (`oauth2_authcode` and `oauth1_xauth`) and OAuth2 token refresh.
+
+To use, add to your `depends.js` and include a kind in your view:
+
+```
+{ kind: "Helpers.OAuthBroker", name: "broker", appName: "myapp",
+  onCode: "showCode", onConnected: "storeTokens",
+  onExpired: "codeExpired", onError: "brokerError" }
+```
+
+Then call `this.$.broker.start()` to begin. See **[OAuthExample/](OAuthExample/)** for a complete example view, a `CLAUDE.md` guide, and how to add your own app to the broker (open a PR at [oauth-broker-for-webos](https://github.com/webOSArchive/oauth-broker-for-webos)).
+
 ### Updater-Helper.js
 
 This is a complete Helper control that implements virtually everything you need to include an automatic updater in your app.
