@@ -2,6 +2,12 @@
 
 Shared libraries for webOS mobile development. You can either copy these into your projects, and manually update, or symlink in from this repo.
 
+## AppStorage
+
+### webos-app-storage.js
+
+Cloud key/value storage tied to the user's webOS Account: save small per-user values (settings, preferences, progress) and read them back on any device the user signs into — including community apps running as PWAs on other platforms. Framework-agnostic ES5 (works in Mojo, Enyo, and modern browsers), values scrambled client-side before upload. See **[AppStorage/](AppStorage/)** for the API reference and sync patterns.
+
 ## Mojo
 
 ### app-model.js
