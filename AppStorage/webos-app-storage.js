@@ -286,8 +286,21 @@
     // ---- The SDK -----------------------------------------------------------
 
     /**
+     * Human-readable app name from a reverse-DNS id, for when the caller does
+     * not supply one: "com.webosarchive.papyrus" -> "Papyrus".
+     */
+    function appNameFromId(appId) {
+        var parts = String(appId || "").split(".");
+        var last = parts[parts.length - 1] || "App";
+        return last.charAt(0).toUpperCase() + last.slice(1);
+    }
+
+    /**
      * @param {object} opts
      *   appId       (required) reverse-DNS app id, e.g. "com.example.myapp"
+     *   appName     (optional) display name used to label this browser in the
+     *               account's device list; defaults to the last segment of
+     *               appId, capitalised
      *   serviceBase (optional) API base, default the webOS Archive service
      *   token       (optional) preexisting account token
      *   deviceId    (optional) device id sent as writer metadata
@@ -297,6 +310,7 @@
         opts = opts || {};
         if (!opts.appId) { throw new Error("WebOSAppStorage: opts.appId is required"); }
         this.appId = opts.appId;
+        this.appName = opts.appName || appNameFromId(opts.appId);
         this.serviceBase = opts.serviceBase || DEFAULT_BASE;
         this._transport = opts.transport || xhrTransport;
         this._token = opts.token || lsGet(LS_TOKEN) || null;
@@ -349,6 +363,10 @@
      * Browser/PWA sign-in with the webOS Account login + password. Generates
      * and persists a stable synthetic device id ("pwa-<uuid>") so this browser
      * shows up as one revocable device on the account.
+     *
+     * Sends a device_name of "PWA-<AppName>" so the entry reads as a browser
+     * session rather than sitting in the account's device list looking like a
+     * handset. Sent on every sign-in, so the label follows a renamed app.
      */
     WebOSAppStorage.prototype.signIn = function (login, password, cb) {
         var self = this;
@@ -356,7 +374,8 @@
             this._deviceId = makeDeviceId();
         }
         this._request("POST", "device.php", "authenticateWeb", null,
-            { login: login, password: password, device_id: this._deviceId },
+            { login: login, password: password, device_id: this._deviceId,
+              device_name: "PWA-" + this.appName },
             function (err, json) {
                 if (err) { return cb(err); }
                 self._token = json.token;

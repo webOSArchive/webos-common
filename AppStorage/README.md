@@ -106,6 +106,14 @@ ordering that counts.
   the user runs on a signed-in device could technically address your
   namespace (it gets scrambled blobs, but treat the namespace as shared-trust,
   same as the device filesystem).
+- **appName**: optional display name, used to label this browser in the
+  account's device list as `PWA-<AppName>` (a browser is a revocable client
+  like any other, but it should not sit there looking like a handset).
+  Defaults to the last segment of `appId`, capitalised — so
+  `com.webosarchive.papyrus` becomes `PWA-Papyrus` without you setting
+  anything. Pass it explicitly when your app's display name is not just its
+  id's last segment. Only used by `signIn()`; apps that bring their own token
+  via `setToken()` name their device however that plumbing does.
 - **Sync pattern** (what Papyrus uses): pull on open, push on close, throttled
   background push while active, `list()` to poll cheaply.
 
