@@ -59,11 +59,12 @@ success, otherwise `{ code, status, message, ... }`. Common codes:
 | Method | Notes |
 |---|---|
 | `signIn(login, password, cb)` | Browser/PWA sign-in. Generates and persists a `pwa-<uuid>` device id; the browser becomes one revocable "device" on the account. `cb(err, account)` |
-| `useDeviceAccount(cb)` | webOS only: adopt the token from the device's webOS Account via the Luna bus. |
+| `useDeviceAccount(cb)` | webOS only: adopt the token from the device's webOS Account via the Luna bus, then populate the account info via a live `getAccountInfo()` call (not the bus response's cached alias). |
+| `getAccountInfo(cb)` | Live `{username, email, display_name}` from the web service — use this instead of `getAccount()` whenever you need the *current* value; the device's own local cache (what the bus/`getAccountToken` returns) only updates via on-device sign-in or username-change flows, so it can be stale after a change made elsewhere (e.g. the web admin panel). `cb(err, info)` |
 | `setToken(token[, deviceId])` | Bring your own token (apps with their own account plumbing). |
 | `refreshToken(cb)` | Trade the token for a fresh one (tokens live 365 days). |
 | `signOut(cb)` | Revoke this device's token server-side and forget it locally. |
-| `isSignedIn()` / `getAccount()` | Local state accessors. |
+| `isSignedIn()` / `getAccount()` | Local state accessors — whatever was last cached (from `signIn`/`useDeviceAccount`/`getAccountInfo`), not necessarily current. |
 
 ### Storage
 

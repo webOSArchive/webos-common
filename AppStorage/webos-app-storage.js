@@ -416,6 +416,14 @@
      * On webOS, adopt the token minted when the user signed the DEVICE into
      * their webOS Account (no password prompt in your app). Talks to the
      * account service over the Luna bus; fails cleanly off-device.
+     *
+     * Account identity (username/email/display_name) is then fetched live
+     * via getAccountInfo() rather than trusted from the bus response, which
+     * mirrors the device's local db8 profile cache. That cache is only
+     * refreshed by the device's own sign-in/username-change flows, so it can
+     * be stale after a change made elsewhere (e.g. the web admin panel) -
+     * this way apps always show the current value without asking the user
+     * to re-sign-in or open the Accounts app first.
      */
     WebOSAppStorage.prototype.useDeviceAccount = function (cb) {
         var self = this;
@@ -434,18 +442,37 @@
                 }
                 self._token = token;
                 lsSet(LS_TOKEN, token);
-                // The palmprofile service also returns the account alias
-                // (accountparamsfetcher.js precedent: inResponse.accountAlias).
-                if (parsed.accountAlias) {
-                    self._account = { alias: parsed.accountAlias };
-                    lsSet(LS_ACCOUNT, JSON.stringify(self._account));
-                }
-                cb(null);
+                self.getAccountInfo(function (err, info) {
+                    if (!err && info) {
+                        self._account = info;
+                        lsSet(LS_ACCOUNT, JSON.stringify(info));
+                    } else if (parsed.accountAlias) {
+                        // Live lookup failed (offline?) - fall back to the bus's
+                        // (possibly stale) alias so callers still get something.
+                        self._account = { alias: parsed.accountAlias };
+                        lsSet(LS_ACCOUNT, JSON.stringify(self._account));
+                    }
+                    // A valid token is what matters for storage calls to work;
+                    // don't fail useDeviceAccount just because the identity
+                    // fetch (best-effort metadata) didn't come back.
+                    cb(null);
+                });
             };
             bridge.call("palm://com.palm.accountservices/getAccountToken", "{}");
         } catch (e) {
             cb({ code: "palm_bus_error", status: 0, message: String(e) });
         }
+    };
+
+    /**
+     * Live account info {username, email, display_name} straight from the web
+     * service - use this (rather than getAccount(), which just returns
+     * whatever was last cached) whenever you need to be sure a displayed
+     * username/email reflects the current account, e.g. right after
+     * useDeviceAccount() already calls it, or your app's own "account" screen.
+     */
+    WebOSAppStorage.prototype.getAccountInfo = function (cb) {
+        this._request("GET", "device.php", "getAccountInfo", null, null, cb);
     };
 
     // -- Storage -------------------------------------------------------------

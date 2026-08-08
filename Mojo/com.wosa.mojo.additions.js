@@ -29,6 +29,30 @@ Additions.ShowDialogBox = function(title, message) {
     }
 }
 
+Additions.ShowConfirmDialog = function(title, message, yesLabel, noLabel, onYes, onNo) {
+    var stageController = Mojo.Controller.getAppController().getActiveStageController();
+    if (stageController) {
+        this.controller = stageController.activeScene();
+
+        this.controller.showAlertDialog({
+            onChoose: function(value) {
+                if (value == 'yes') {
+                    if (onYes) onYes();
+                } else {
+                    if (onNo) onNo();
+                }
+            },
+            title: title,
+            message: message,
+            choices: [
+                { label: noLabel, value: 'no' },
+                { label: yesLabel, value: 'yes' }
+            ],
+            allowHTMLMessage: true
+        });
+    }
+}
+
 Additions.DisableWidget = function(widgetName, disabledValue) {
     var stageController = Mojo.Controller.getAppController().getActiveStageController();
     if (stageController) {

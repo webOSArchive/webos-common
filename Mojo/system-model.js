@@ -267,6 +267,70 @@ SystemModel.prototype.LaunchApp = function(appName, params) {
     return true;
 }
 
+//Live account info from the webOS Archive web service, not the device's
+//  cached copy — the Luna bus's accountUsername/accountAlias only refresh via
+//  an on-device sign-in or a username edit through the Accounts app, so they
+//  can go stale after a change made elsewhere (e.g. the web admin panel).
+//  Falls back to the bus-provided values if the live call fails (e.g. offline).
+SystemModel.prototype.fetchLiveAccountInfo = function(token, fallbackUsername, fallbackAlias, callback) {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", "https://appcatalog.webosarchive.org/WebService/device.php?m=getAccountInfo");
+    xmlhttp.setRequestHeader("Authorization", "PalmAuth token=" + token);
+    xmlhttp.timeout = 4000;
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+            var username = fallbackUsername, alias = fallbackAlias;
+            if (xmlhttp.status >= 200 && xmlhttp.status < 300) {
+                try {
+                    var info = JSON.parse(xmlhttp.responseText);
+                    if (info && info.username) {
+                        username = info.username;
+                        alias = info.email || info.username;
+                    }
+                } catch (e) {
+                    Mojo.Log.info("getAccountInfo: could not parse response: " + e);
+                }
+            } else {
+                Mojo.Log.info("getAccountInfo: live lookup failed (status " + xmlhttp.status + "), using cached account info");
+            }
+            callback({ username: username, alias: alias, token: token });
+        }
+    };
+    xmlhttp.ontimeout = function() {
+        Mojo.Log.info("getAccountInfo: live lookup timed out, using cached account info");
+        callback({ username: fallbackUsername, alias: fallbackAlias, token: token });
+    };
+    xmlhttp.send();
+};
+
+//Check whether a webOS account is signed in on this device.
+//  Calls back with { username, alias, token } if signed in, or null if not signed in / unavailable.
+//  username/alias are fetched live (see fetchLiveAccountInfo above) rather than
+//  trusted from the device's cached copy.
+SystemModel.prototype.GetAccountToken = function(callback) {
+    this.accountRequest = new Mojo.Service.Request("palm://com.palm.accountservices/", {
+        method: "getAccountToken",
+        parameters: {},
+        onSuccess: function(response) {
+            if (response && response.token) {
+                this.fetchLiveAccountInfo(
+                    response.token,
+                    response.accountUsername || response.accountAlias,
+                    response.accountAlias,
+                    callback
+                );
+            } else {
+                callback(null);
+            }
+        }.bind(this),
+        onFailure: function(response) {
+            Mojo.Log.info("No webOS account signed in (or account service unavailable): " + JSON.stringify(response));
+            callback(null);
+        }
+    });
+    return true;
+}
+
 //Use in combination with a Touch2Share launch to send a URI to a tapped device
 SystemModel.prototype.SendDataForTouch2Share = function(url, callback) {
     if (!url) {
